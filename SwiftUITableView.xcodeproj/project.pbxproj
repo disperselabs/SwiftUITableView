@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		666314CB2609030500A5BAA4 /* Emitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 666314CA2609030500A5BAA4 /* Emitter.swift */; };
 		F561C57C2561480800CD506E /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F561C57A2561480800CD506E /* TableViewController.swift */; };
 		F561C57D2561480800CD506E /* TableViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F561C57B2561480800CD506E /* TableViewController.xib */; };
 		F5994518255FEB8F00B1F8E5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5994517255FEB8F00B1F8E5 /* AppDelegate.swift */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		666314CA2609030500A5BAA4 /* Emitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Emitter.swift; sourceTree = "<group>"; };
 		F561C57A2561480800CD506E /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		F561C57B2561480800CD506E /* TableViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TableViewController.xib; sourceTree = "<group>"; };
 		F5994514255FEB8F00B1F8E5 /* SwiftUITableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftUITableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -61,6 +63,7 @@
 			children = (
 				F5994517255FEB8F00B1F8E5 /* AppDelegate.swift */,
 				F5994519255FEB8F00B1F8E5 /* ContentView.swift */,
+				666314CA2609030500A5BAA4 /* Emitter.swift */,
 				F561C57A2561480800CD506E /* TableViewController.swift */,
 				F561C57B2561480800CD506E /* TableViewController.xib */,
 				F599451B255FEB9100B1F8E5 /* Assets.xcassets */,
@@ -153,6 +156,7 @@
 			files = (
 				F599451A255FEB8F00B1F8E5 /* ContentView.swift in Sources */,
 				F561C57C2561480800CD506E /* TableViewController.swift in Sources */,
+				666314CB2609030500A5BAA4 /* Emitter.swift in Sources */,
 				F5994518255FEB8F00B1F8E5 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -292,11 +296,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = SwiftUITableView/SwiftUITableView.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"SwiftUITableView/Preview Content\"";
-				DEVELOPMENT_TEAM = DNL2F39G5D;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SwiftUITableView/Info.plist;
@@ -304,9 +308,10 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				PRODUCT_BUNDLE_IDENTIFIER = CH.SwiftUITableView;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -317,11 +322,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = SwiftUITableView/SwiftUITableView.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"SwiftUITableView/Preview Content\"";
-				DEVELOPMENT_TEAM = DNL2F39G5D;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SwiftUITableView/Info.plist;
@@ -329,9 +334,10 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				PRODUCT_BUNDLE_IDENTIFIER = CH.SwiftUITableView;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;

@@ -10,7 +10,8 @@ import SwiftUI
 import AppKit
 
 class Item: NSObject, Identifiable {
-    @objc var id = UUID()
+    
+    @objc var id: String = "\(Int.random(in: 0..<65535))"
     @objc var name: String
     @objc var cleared: Bool
     
@@ -18,18 +19,21 @@ class Item: NSObject, Identifiable {
         self.name = name
         self.cleared = cleared
     }
+    
 }
 
 struct ContentView: View {
+
+    @ObservedObject var emitter: Emitter
         
-    @State private var items = [Item]()
+    @State var items = [Item]()
     @State private var rowSelected = -1
     @State private var selectedName = ""
-    @State private var selectedRef: UUID? = nil
+    @State private var selectedRef: String? = nil
     @State private var selectedCleared = false
     
     var body: some View {
-        HSplitView { // Placing top level view inside a SplitView prevents this runtime warning: SwiftUITableView[9921:321879] [General] ERROR: Setting <_TtC7SwiftUIP33_9FEBA96B0BC70E1682E82D239F242E7319SwiftUIAppKitButton: 0x7fd4bd919d60> as the first responder for window <NSWindow: 0x7fd4bd904db0>, but it is in a different window ((null))! This would eventually crash when the view is freed. The first responder will be set to nil.
+        HSplitView {
             VStack {
                 HStack {
                     Button("Clear") {
@@ -37,7 +41,8 @@ struct ContentView: View {
                         rowSelected = -1
                     }
                     .disabled(items.count == 0)
-                    Button("Populate") { // reloads items and preselects last item
+                    
+                    Button("Populate") {
                         items = getitems()
                         rowSelected = items.count - 1
                         selectedRef = items[rowSelected].id
@@ -45,22 +50,29 @@ struct ContentView: View {
                         selectedCleared = items[rowSelected].cleared
                     }
                     .disabled(items.count > 0)
+                    
                     Button("Delete") {
                         items.remove(at: rowSelected)
                         rowSelected = -1
                     }
                     .disabled(rowSelected == -1)
                 }
-                TableVC(items: $items, rowSelected: $rowSelected, selectedName: $selectedName, selectedCleared: $selectedCleared)
+                
+                Table(items: $items,
+                      rowSelected: $rowSelected,
+                      selectedName: $selectedName,
+                      selectedCleared: $selectedCleared)
                     .frame(minWidth: 450, minHeight: 200)
                     .onAppear(perform: {
                         items = getitems()
+                        emitter.start()
                     })
+                
                 HStack {
                     if rowSelected >= 0 {
                         Text(selectedName)
-                        Text(items[rowSelected].id.uuidString)
-                        Text(selectedCleared == true ? "True":"False")
+                        Text(items[rowSelected].id)
+                        Text(selectedCleared == true ? "True" : "False")
                     }
                     else {
                         Text("None")
@@ -70,10 +82,25 @@ struct ContentView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
+        .onReceive(emitter.newItems) { newItems in
+            guard !items.isEmpty else { return }
+
+            let random = Int.random(in: 0..<items.count)
+            items.insert(contentsOf: newItems, at: random)
+            
+            print("Added: Date(): \(Date()), count: \(newItems.count), rows: \(items.count)")
+        }
+        .onReceive(emitter.indexSetToRemove) { indexSetToRemove in
+            guard !items.isEmpty else { return }
+            
+            items.remove(atOffsets: indexSetToRemove)
+            
+            print("Removed: Date(): \(Date()), count: \(indexSetToRemove.count), rows: \(items.count)")
+        }
     }
 }
 
-struct TableVC: NSViewControllerRepresentable {
+struct Table: NSViewControllerRepresentable {
     
     @Binding var items: [Item]
     @Binding var rowSelected: Int
@@ -81,49 +108,53 @@ struct TableVC: NSViewControllerRepresentable {
     @Binding var selectedCleared: Bool
     
     func makeNSViewController(context: Context) -> NSViewController {
-        let tableVC = TableViewController()
-        return tableVC
+        let tableViewController = TableViewController()
+        return tableViewController
     }
         
     func updateNSViewController(_ nsViewController: NSViewController, context: Context) {
-        guard let tableVC = nsViewController as? TableViewController else {return}
-        tableVC.setContents(items: items)
-        tableVC.tableView?.delegate = context.coordinator
+        guard let tableViewController = nsViewController as? TableViewController else { return }
+        
+        tableViewController.setContents(items: items)
+        tableViewController.tableView?.delegate = context.coordinator
+        
         guard rowSelected >= 0 else {
-            tableVC.arrayController.removeSelectionIndexes([0])
+            tableViewController.arrayController.removeSelectionIndexes([0])
             return
         }
-        tableVC.arrayController.setSelectionIndex(rowSelected)
-        tableVC.tableView.scrollRowToVisible(rowSelected)
+        
+        tableViewController.arrayController.setSelectionIndex(rowSelected)
+        tableViewController.tableView.scrollRowToVisible(rowSelected)
     }
     
     class Coordinator: NSObject, NSTableViewDelegate {
         
-        var parent: TableVC
+        var parent: Table
         
-        init(_ parent: TableVC) {
+        init(_ parent: Table) {
             self.parent = parent
         }
         
         func tableViewSelectionDidChange(_ notification: Notification) {
-            guard let tableView = notification.object as? NSTableView else {return}
-            guard self.parent.items.count > 0 else {return}
+            guard let tableView = notification.object as? NSTableView else { return }
+            guard self.parent.items.count > 0 else { return }
             guard tableView.selectedRow >= 0 else {
                 self.parent.rowSelected = -1
                 return
             }
+            
             self.parent.rowSelected = tableView.selectedRow
             self.parent.selectedName = self.parent.items[tableView.selectedRow].name
             self.parent.selectedCleared = self.parent.items[tableView.selectedRow].cleared
         }
 
         @IBAction func nameCellEdited(_ sender: Any) {
-            guard let textView = sender as? NSTextField else {return}
+            guard let textView = sender as? NSTextField else { return }
             self.parent.selectedName = textView.stringValue
         }
         
         @IBAction func clearedCellToggled(_ sender: Any) {
-            guard self.parent.rowSelected >= 0 else {return}
+            guard self.parent.rowSelected >= 0 else { return }
             self.parent.selectedCleared = self.parent.items[self.parent.rowSelected].cleared
         }
         
@@ -132,41 +163,23 @@ struct TableVC: NSViewControllerRepresentable {
     func makeCoordinator() -> Coordinator {
         return Coordinator(self)
     }
+
 }
 
 func getitems() -> [Item] {
-    return [
-        Item(name: "Alpha", cleared: false),
-        Item(name: "Bravo", cleared: false),
-        Item(name: "Charlie", cleared: false),
-        Item(name: "Delta", cleared: false),
-        Item(name: "Echo", cleared: false),
-        Item(name: "Foxtrot", cleared: false),
-        Item(name: "Golf", cleared: false),
-        Item(name: "Hotel", cleared: false),
-        Item(name: "India", cleared: false),
-        Item(name: "Juliet", cleared: false),
-        Item(name: "Kilo", cleared: false),
-        Item(name: "Lima", cleared: false),
-        Item(name: "Mike", cleared: true),
-        Item(name: "November", cleared: false),
-        Item(name: "Oscar", cleared: false),
-        Item(name: "Papa", cleared: false),
-        Item(name: "Quebec", cleared: false),
-        Item(name: "Romeo", cleared: false),
-        Item(name: "Sierra", cleared: false),
-        Item(name: "Tango", cleared: false),
-        Item(name: "Uniform", cleared: false),
-        Item(name: "Victor", cleared: false),
-        Item(name: "Whiskey", cleared: false),
-        Item(name: "X-Ray", cleared: false),
-        Item(name: "Yankee", cleared: false),
-        Item(name: "Zulu", cleared: false)
-    ]
+    var array: [Item] = []
+    
+    for index in 0...100000 {
+        array.append(Item(name: "Original \(index)", cleared: false))
+    }
+    
+    return array
 }
 
 struct ContentView_Previews: PreviewProvider {
+    
     static var previews: some View {
-        ContentView()
+        ContentView(emitter: Emitter())
     }
+    
 }
